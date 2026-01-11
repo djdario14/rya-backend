@@ -18,6 +18,7 @@ class Prestamo(Base):
     cliente_id = Column(Integer, ForeignKey('clientes.id'))
     monto = Column(Float)
     fecha = Column(Date)
+    estado = Column(String, nullable=False, default='activo')
     cliente = relationship('Cliente', back_populates='prestamos')
     pagos = relationship('Pago', back_populates='prestamo')
 

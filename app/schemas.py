@@ -21,6 +21,7 @@ class Cliente(ClienteBase):
 class PrestamoBase(BaseModel):
     monto: float
     fecha: date
+    estado: str = 'activo'
 
 class PrestamoCreate(PrestamoBase):
     cliente_id: int
