@@ -1,3 +1,5 @@
+# Para PostgreSQL en Railway
+psycopg2-binary
 fastapi
 uvicorn
 sqlalchemy
