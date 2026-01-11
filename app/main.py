@@ -11,7 +11,10 @@ app.add_middleware(
 	CORSMiddleware,
 	allow_origins=[
 		"https://rya-cobranza.vercel.app",
-		"https://rya-git-main-djdario14s-projects.vercel.app"
+		"https://rya-git-main-djdario14s-projects.vercel.app",
+		"https://rya-fronted.vercel.app",
+		"http://localhost:3000",
+		"http://127.0.0.1:3000"
 	],
 	allow_credentials=True,
 	allow_methods=["*"],
