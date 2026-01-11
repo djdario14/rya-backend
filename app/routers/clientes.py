@@ -16,7 +16,10 @@ def create_cliente(cliente: schemas.ClienteBase):
     db = database.SessionLocal()
     db_cliente = models.Cliente(
         nombre=cliente.nombre,
-        # Si agregas más campos en el modelo, agrégalos aquí
+        cedula=cliente.cedula,
+        direccion=cliente.direccion,
+        negocio=cliente.negocio,
+        telefono=cliente.telefono
     )
     db.add(db_cliente)
     db.commit()

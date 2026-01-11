@@ -5,7 +5,11 @@ from .database import Base
 class Cliente(Base):
     __tablename__ = 'clientes'
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, index=True)
+    nombre = Column(String, index=True, nullable=False)
+    cedula = Column(String, nullable=False)
+    direccion = Column(String, nullable=False)
+    negocio = Column(String, nullable=False)
+    telefono = Column(String, nullable=False)
     prestamos = relationship('Prestamo', back_populates='cliente')
 
 class Prestamo(Base):
