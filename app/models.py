@@ -6,6 +6,10 @@ class Cliente(Base):
     __tablename__ = 'clientes'
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, index=True)
+    cedula = Column(String, index=True)
+    direccion = Column(String)
+    negocio = Column(String)
+    telefono = Column(String)
     prestamos = relationship('Prestamo', back_populates='cliente')
 
 class Prestamo(Base):

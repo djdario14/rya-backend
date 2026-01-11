@@ -4,6 +4,10 @@ from datetime import date
 
 class ClienteBase(BaseModel):
     nombre: str
+    cedula: str
+    direccion: str
+    negocio: str
+    telefono: str
 
 class ClienteCreate(ClienteBase):
     pass
