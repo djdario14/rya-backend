@@ -1,7 +1,17 @@
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from .routers import clientes, prestamos, pagos, usuarios
 
 app = FastAPI()
+
+app.add_middleware(
+	CORSMiddleware,
+	allow_origins=["*"],  # Puedes restringir a tu dominio Vercel si lo prefieres
+	allow_credentials=True,
+	allow_methods=["*"],
+	allow_headers=["*"],
+)
 
 app.include_router(clientes.router)
 app.include_router(prestamos.router)
