@@ -9,7 +9,9 @@ app = FastAPI()
 
 app.add_middleware(
 	CORSMiddleware,
-	allow_origins=["*"],  # Puedes restringir a tu dominio Vercel si lo prefieres
+	allow_origins=[
+		"https://rya-git-main-djdario14s-projects.vercel.app"
+	],
 	allow_credentials=True,
 	allow_methods=["*"],
 	allow_headers=["*"],
