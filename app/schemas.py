@@ -16,7 +16,7 @@ class ClienteCreate(ClienteBase):
 class Cliente(ClienteBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PrestamoBase(BaseModel):
     monto: float
@@ -30,7 +30,7 @@ class Prestamo(PrestamoBase):
     id: int
     cliente_id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PagoBase(BaseModel):
     monto: float
@@ -43,7 +43,7 @@ class Pago(PagoBase):
     id: int
     prestamo_id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UsuarioBase(BaseModel):
     username: str
@@ -54,4 +54,4 @@ class UsuarioCreate(UsuarioBase):
 class Usuario(UsuarioBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
