@@ -1,12 +1,3 @@
-# Endpoint para obtener un cliente por id
-@router.get("/{cliente_id}", response_model=schemas.Cliente)
-def get_cliente(cliente_id: int):
-    db = database.SessionLocal()
-    cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
-    if not cliente:
-        raise HTTPException(status_code=404, detail="Cliente no encontrado")
-    return cliente
-
 
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
@@ -30,6 +21,15 @@ def get_cliente_saldo(cliente_id: int):
     prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.id.desc()).first()
     if not prestamo:
         return {"saldo": 0.0, "prestamo": 0.0, "cuotasTotal": 0, "cuotasPagadas": 0, "atraso": 0}
+
+# Endpoint para obtener un cliente por id
+@router.get("/{cliente_id}", response_model=schemas.Cliente)
+def get_cliente(cliente_id: int):
+    db = database.SessionLocal()
+    cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+    return cliente
 @router.get("/{cliente_id}", response_model=schemas.Cliente)
 def get_cliente(cliente_id: int):
     db = database.SessionLocal()
