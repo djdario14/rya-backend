@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models, schemas
@@ -6,8 +6,23 @@ from .. import models, schemas
 router = APIRouter(prefix="/prestamos", tags=["prestamos"])
 
 @router.get("/")
-def list_prestamos():
-    return ["prestamo1", "prestamo2"]
+def list_prestamos(cliente_id: int = Query(None), estado: str = Query(None), db: Session = Depends(get_db)):
+    query = db.query(models.Prestamo)
+    if cliente_id is not None:
+        query = query.filter(models.Prestamo.cliente_id == cliente_id)
+    if estado is not None:
+        query = query.filter(models.Prestamo.estado == estado)
+    prestamos = query.all()
+    return [
+        {
+            "id": p.id,
+            "cliente_id": p.cliente_id,
+            "monto": p.monto,
+            "fecha": p.fecha.isoformat() if p.fecha else None,
+            "estado": p.estado
+        }
+        for p in prestamos
+    ]
 
 # Nuevo endpoint para crear préstamos
 @router.post("/", response_model=schemas.Prestamo)
