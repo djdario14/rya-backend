@@ -28,7 +28,16 @@ class Pago(Base):
     prestamo_id = Column(Integer, ForeignKey('prestamos.id'))
     monto = Column(Float)
     fecha = Column(Date)
+    motivo_no_pago = Column(String, nullable=True)  # Nuevo campo para motivo de no abono
     prestamo = relationship('Prestamo', back_populates='pagos')
+
+
+class Gasto(Base):
+    __tablename__ = 'gastos'
+    id = Column(Integer, primary_key=True, index=True)
+    monto = Column(Float, nullable=False)
+    descripcion = Column(String, nullable=False)
+    fecha = Column(Date, nullable=False)
 
 class Usuario(Base):
     __tablename__ = 'usuarios'

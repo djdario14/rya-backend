@@ -113,10 +113,6 @@ def get_cliente(cliente_id: int):
 @router.post("/", response_model=schemas.Cliente)
 def create_cliente(cliente: schemas.ClienteBase):
     db = database.SessionLocal()
-    # Verificar si la cédula ya existe
-    existe = db.query(models.Cliente).filter(models.Cliente.cedula == cliente.cedula).first()
-    if existe:
-        raise HTTPException(status_code=409, detail="La cédula ya está registrada")
     db_cliente = models.Cliente(
         nombre=cliente.nombre,
         cedula=cliente.cedula,

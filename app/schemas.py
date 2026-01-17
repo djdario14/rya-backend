@@ -32,12 +32,16 @@ class Prestamo(PrestamoBase):
     class Config:
         from_attributes = True
 
+
 class PagoBase(BaseModel):
-    monto: float
+    monto: float | None = None
     fecha: date
+    motivo_no_pago: str | None = None
+
 
 class PagoCreate(PagoBase):
     prestamo_id: int
+
 
 class Pago(PagoBase):
     id: int
@@ -50,6 +54,20 @@ class UsuarioBase(BaseModel):
 
 class UsuarioCreate(UsuarioBase):
     password: str
+
+
+class GastoBase(BaseModel):
+    monto: float
+    descripcion: str
+    fecha: date
+
+class GastoCreate(GastoBase):
+    pass
+
+class Gasto(GastoBase):
+    id: int
+    class Config:
+        from_attributes = True
 
 class Usuario(UsuarioBase):
     id: int

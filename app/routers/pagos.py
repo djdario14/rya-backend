@@ -26,8 +26,9 @@ def create_pago(pago: schemas.PagoCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Préstamo no encontrado")
     db_pago = models.Pago(
         prestamo_id=pago.prestamo_id,
-        monto=pago.monto,
-        fecha=pago.fecha
+        monto=pago.monto if pago.monto is not None else 0,
+        fecha=pago.fecha,
+        motivo_no_pago=pago.motivo_no_pago
     )
     db.add(db_pago)
     db.commit()
