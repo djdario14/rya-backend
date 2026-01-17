@@ -71,8 +71,39 @@ def reporte_diario(db: Session = Depends(get_db)):
 def ping():
     return {"message": "pong"}
 
-app.include_router(clientes.router)
-app.include_router(prestamos.router)
-app.include_router(pagos.router)
-app.include_router(usuarios.router)
-app.include_router(gastos.router)
+import sys
+
+try:
+    print('Incluyendo router de clientes...', file=sys.stderr)
+    app.include_router(clientes.router)
+    print('Incluido router de clientes', file=sys.stderr)
+except Exception as e:
+    print(f'Error en clientes.router: {e}', file=sys.stderr)
+
+try:
+    print('Incluyendo router de prestamos...', file=sys.stderr)
+    app.include_router(prestamos.router)
+    print('Incluido router de prestamos', file=sys.stderr)
+except Exception as e:
+    print(f'Error en prestamos.router: {e}', file=sys.stderr)
+
+try:
+    print('Incluyendo router de pagos...', file=sys.stderr)
+    app.include_router(pagos.router)
+    print('Incluido router de pagos', file=sys.stderr)
+except Exception as e:
+    print(f'Error en pagos.router: {e}', file=sys.stderr)
+
+try:
+    print('Incluyendo router de usuarios...', file=sys.stderr)
+    app.include_router(usuarios.router)
+    print('Incluido router de usuarios', file=sys.stderr)
+except Exception as e:
+    print(f'Error en usuarios.router: {e}', file=sys.stderr)
+
+try:
+    print('Incluyendo router de gastos...', file=sys.stderr)
+    app.include_router(gastos.router)
+    print('Incluido router de gastos', file=sys.stderr)
+except Exception as e:
+    print(f'Error en gastos.router: {e}', file=sys.stderr)
