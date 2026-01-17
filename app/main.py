@@ -25,7 +25,7 @@ app.add_middleware(
 
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from .database import get_db
+from .database import get_db, SessionLocal
 from datetime import date
 from . import models
 
@@ -70,6 +70,29 @@ def reporte_diario(db: Session = Depends(get_db)):
 @app.get("/ping")
 def ping():
     return {"message": "pong"}
+
+@app.get("/clientes/{cliente_id}/prestamos")
+def prestamos_direct(cliente_id: int):
+    db = SessionLocal()
+    try:
+        prestamos = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id).order_by(models.Prestamo.fecha.desc()).all()
+        prestamos_list = []
+        for p in prestamos:
+            interes = p.monto * 0.20
+            total_credito = p.monto + interes
+            pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == p.id).all()
+            total_abonos = sum(pg.monto for pg in pagos)
+            saldo = round(total_credito - total_abonos, 2)
+            prestamos_list.append({
+                "id": p.id,
+                "saldo": saldo,
+                "valor": p.monto,
+                "fecha": p.fecha,
+                "estado": p.estado
+            })
+        return prestamos_list
+    finally:
+        db.close()
 
 import sys
 
