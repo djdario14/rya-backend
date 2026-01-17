@@ -1,4 +1,3 @@
-
 # Redeploy trigger
 
 from fastapi import FastAPI
@@ -67,6 +66,10 @@ def reporte_diario(db: Session = Depends(get_db)):
 		"gastos_dia": gastos_dia,
 		"caja_actual": caja_actual
 	}
+
+@app.get("/ping")
+def ping():
+    return {"message": "pong"}
 
 app.include_router(clientes.router)
 app.include_router(prestamos.router)
