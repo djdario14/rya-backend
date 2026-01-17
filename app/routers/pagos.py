@@ -40,8 +40,12 @@ def create_pago(pago: schemas.PagoCreate, db: Session = Depends(get_db)):
     pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == db_prestamo.id).all()
     total_abonos = sum(pg.monto for pg in pagos)
     saldo = round(total_credito - total_abonos, 2)
-    if saldo <= 0 and db_prestamo.estado == 'activo':
+    # Sincronizar estado del préstamo según saldo
+    if saldo <= 0 and db_prestamo.estado != 'pagado':
         db_prestamo.estado = 'pagado'
+        db.commit()
+    elif saldo > 0 and db_prestamo.estado != 'activo':
+        db_prestamo.estado = 'activo'
         db.commit()
 
     return db_pago
