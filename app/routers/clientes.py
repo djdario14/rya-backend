@@ -10,16 +10,24 @@ def get_prestamos_cliente(cliente_id: int):
     db = database.SessionLocal()
     try:
         prestamos = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id).order_by(models.Prestamo.fecha.desc()).all()
-        return [
-            {
+        prestamos_list = []
+        for p in prestamos:
+            saldo = None
+            if p.estado == 'activo':
+                # Calcular saldo solo para el préstamo activo
+                interes = p.monto * 0.20
+                total_credito = p.monto + interes
+                pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == p.id).all()
+                total_abonos = sum(pg.monto for pg in pagos)
+                saldo = round(total_credito - total_abonos, 2)
+            prestamos_list.append({
                 "id": p.id,
-                "saldo": None,  # Puedes calcular el saldo si lo necesitas
+                "saldo": saldo,
                 "valor": p.monto,
                 "fecha": p.fecha,
                 "estado": p.estado
-            }
-            for p in prestamos
-        ]
+            })
+        return prestamos_list
     finally:
         db.close()
 
