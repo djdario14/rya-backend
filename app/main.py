@@ -15,7 +15,8 @@ app.add_middleware(
 		"https://rya-git-main-djdario14s-projects.vercel.app",
 		"https://rya-fronted.vercel.app",
 		"http://localhost:3000",
-		"http://127.0.0.1:3000"
+		"http://127.0.0.1:3000",
+		"https://rya-backend-production.up.railway.app"
 	],
 	allow_credentials=True,
 	allow_methods=["*"],
