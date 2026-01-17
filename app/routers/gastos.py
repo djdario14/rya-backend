@@ -9,8 +9,12 @@ router = APIRouter(prefix="/gastos", tags=["gastos"])
 @router.get("/semana", response_model=list[schemas.Gasto])
 def get_gastos_semana(db: Session = Depends(get_db)):
     hoy = date.today()
-    inicio_semana = hoy - timedelta(days=hoy.weekday())
-    gastos = db.query(models.Gasto).filter(models.Gasto.fecha >= inicio_semana).order_by(models.Gasto.fecha.desc()).all()
+    inicio_semana = hoy - timedelta(days=hoy.weekday())  # Lunes
+    fin_semana = inicio_semana + timedelta(days=6)  # Domingo
+    gastos = db.query(models.Gasto).filter(
+        models.Gasto.fecha >= inicio_semana,
+        models.Gasto.fecha <= fin_semana
+    ).order_by(models.Gasto.fecha.desc()).all()
     return gastos
 
 @router.post("/", response_model=schemas.Gasto)
