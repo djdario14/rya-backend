@@ -12,14 +12,12 @@ def get_prestamos_cliente(cliente_id: int):
         prestamos = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id).order_by(models.Prestamo.fecha.desc()).all()
         prestamos_list = []
         for p in prestamos:
-            saldo = None
-            if p.estado == 'activo':
-                # Calcular saldo solo para el préstamo activo
-                interes = p.monto * 0.20
-                total_credito = p.monto + interes
-                pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == p.id).all()
-                total_abonos = sum(pg.monto for pg in pagos)
-                saldo = round(total_credito - total_abonos, 2)
+            # Calcular saldo para todos los préstamos (activos e inactivos)
+            interes = p.monto * 0.20
+            total_credito = p.monto + interes
+            pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == p.id).all()
+            total_abonos = sum(pg.monto for pg in pagos)
+            saldo = round(total_credito - total_abonos, 2)
             prestamos_list.append({
                 "id": p.id,
                 "saldo": saldo,
