@@ -1,20 +1,10 @@
-@router.get("/{cliente_id}/prestamos")
-def get_prestamos_cliente(cliente_id: int):
-    db = database.SessionLocal()
-    try:
-        prestamos = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id).order_by(models.Prestamo.fecha.desc()).all()
-        return [
-            {
-                "id": p.id,
-                "saldo": None,  # Puedes calcular el saldo si lo necesitas
-                "valor": p.monto,
-                "fecha": p.fecha,
-                "estado": p.estado
-            }
-            for p in prestamos
-        ]
-    finally:
-        db.close()
+from fastapi import APIRouter, HTTPException
+from sqlalchemy.orm import Session
+from .. import models, schemas, database
+from sqlalchemy import func
+
+router = APIRouter(prefix="/clientes", tags=["clientes"])
+
 @router.get("/{cliente_id}/prestamos")
 def get_prestamos_cliente(cliente_id: int):
     db = database.SessionLocal()
