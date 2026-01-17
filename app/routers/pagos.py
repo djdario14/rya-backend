@@ -33,4 +33,15 @@ def create_pago(pago: schemas.PagoCreate, db: Session = Depends(get_db)):
     db.add(db_pago)
     db.commit()
     db.refresh(db_pago)
+
+    # Calcular saldo después del pago
+    interes = db_prestamo.monto * 0.20
+    total_credito = db_prestamo.monto + interes
+    pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == db_prestamo.id).all()
+    total_abonos = sum(pg.monto for pg in pagos)
+    saldo = round(total_credito - total_abonos, 2)
+    if saldo <= 0 and db_prestamo.estado == 'activo':
+        db_prestamo.estado = 'pagado'
+        db.commit()
+
     return db_pago
