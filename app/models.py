@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
+import datetime
 from .database import Base
 
 class Cliente(Base):
@@ -11,6 +12,7 @@ class Cliente(Base):
     negocio = Column(String, nullable=False)
     telefono = Column(String, nullable=False)
     prestamos = relationship('Prestamo', back_populates='cliente')
+    recordatorios = relationship("Recordatorio", back_populates="cliente", cascade="all, delete-orphan")
 
 class Prestamo(Base):
     __tablename__ = 'prestamos'
@@ -44,3 +46,13 @@ class Usuario(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+
+class Recordatorio(Base):
+    __tablename__ = "recordatorios"
+    id = Column(Integer, primary_key=True, index=True)
+    cliente_id = Column(Integer, ForeignKey("clientes.id"), nullable=False)
+    fecha = Column(DateTime, nullable=False)
+    nota = Column(String, nullable=True)
+    creado_en = Column(DateTime, default=datetime.datetime.utcnow)
+
+    cliente = relationship("Cliente", back_populates="recordatorios")

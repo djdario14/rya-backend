@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import date
+from datetime import date, datetime
 
 
 class ClienteBase(BaseModel):
@@ -73,3 +73,18 @@ class Usuario(UsuarioBase):
     id: int
     class Config:
         from_attributes = True
+
+class RecordatorioBase(BaseModel):
+    fecha: datetime
+    nota: str = ""
+
+class RecordatorioCreate(RecordatorioBase):
+    pass
+
+class RecordatorioOut(RecordatorioBase):
+    id: int
+    cliente_id: int
+    creado_en: datetime
+
+    class Config:
+        orm_mode = True
