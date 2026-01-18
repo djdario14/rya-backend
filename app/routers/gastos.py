@@ -1,3 +1,19 @@
+from fastapi import Query
+@router.get("/", response_model=list[schemas.Gasto])
+def get_gastos_periodo(periodo: str = Query("dia", enum=["dia", "semana"]), db: Session = Depends(get_db)):
+    hoy = date.today()
+    if periodo == "dia":
+        gastos = db.query(models.Gasto).filter(models.Gasto.fecha == hoy).order_by(models.Gasto.fecha.desc()).all()
+    elif periodo == "semana":
+        inicio_semana = hoy - timedelta(days=hoy.weekday())  # Lunes
+        fin_semana = inicio_semana + timedelta(days=6)  # Domingo
+        gastos = db.query(models.Gasto).filter(
+            models.Gasto.fecha >= inicio_semana,
+            models.Gasto.fecha <= fin_semana
+        ).order_by(models.Gasto.fecha.desc()).all()
+    else:
+        gastos = []
+    return gastos
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import get_db
