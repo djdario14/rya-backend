@@ -1,4 +1,11 @@
-from fastapi import Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+from ..database import get_db
+from .. import models, schemas
+from datetime import date, timedelta
+
+router = APIRouter(prefix="/gastos", tags=["gastos"])
+
 @router.get("/", response_model=list[schemas.Gasto])
 def get_gastos_periodo(periodo: str = Query("dia", enum=["dia", "semana"]), db: Session = Depends(get_db)):
     hoy = date.today()
