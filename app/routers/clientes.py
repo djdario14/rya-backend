@@ -51,7 +51,7 @@ def list_clientes():
 def get_cliente_saldo(cliente_id: int):
     db = database.SessionLocal()
     try:
-        prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.id.desc()).first()
+        prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.fecha.desc()).first()
         if not prestamo:
             return {"saldo": 0.0, "prestamo": 0.0, "cuotasTotal": 0, "cuotasPagadas": 0, "atraso": 0, "fecha_prestamo": None}
 
