@@ -25,13 +25,14 @@ from .database import get_db
 from datetime import date
 from . import models
 
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import clientes, prestamos, pagos, usuarios, gastos, recordatorios
 
-
 app = FastAPI()
+
 @app.get("/pagos/dia")
 def pagos_del_dia(db: Session = Depends(get_db)):
 	hoy = date.today()
@@ -46,6 +47,24 @@ def pagos_del_dia(db: Session = Depends(get_db)):
 			"valor": pago.monto
 		})
 	return JSONResponse(resultados)
+
+@app.get("/prestamos/dia")
+def prestamos_del_dia(db: Session = Depends(get_db)):
+	hoy = date.today()
+	prestamos = db.query(models.Prestamo).filter(models.Prestamo.fecha == hoy).all()
+	resultados = []
+	for prestamo in prestamos:
+		cliente = db.query(models.Cliente).filter(models.Cliente.id == prestamo.cliente_id).first()
+		interes = round(prestamo.monto * 0.20)
+		cuotas = 30  # Asumido fijo, ajusta si es variable
+		resultados.append({
+			"fecha": prestamo.fecha.strftime("%A, %d %B %Y, %I:%M:%S %p"),
+			"nombre": cliente.nombre if cliente else None,
+			"valor": int(prestamo.monto),
+			"interes": interes,
+			"cuotas": cuotas
+		})
+	return resultados
 
 app.add_middleware(
 	CORSMiddleware,
