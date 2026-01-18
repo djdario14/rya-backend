@@ -14,6 +14,35 @@ def get_pagos_by_cliente(cliente_id: int, db: Session = Depends(get_db)):
     for prestamo in prestamos:
         pagos += db.query(models.Pago).filter(models.Pago.prestamo_id == prestamo.id).all()
     return pagos
+    
+@router.post("/cancelar-deuda-total")
+def cancelar_deuda_total(data: dict, db: Session = Depends(get_db)):
+    prestamo_id = data.get("prestamo_id")
+    fecha = data.get("fecha")
+    db_prestamo = db.query(models.Prestamo).filter(models.Prestamo.id == prestamo_id).first()
+    if not db_prestamo:
+        raise HTTPException(status_code=404, detail="Préstamo no encontrado")
+    # Calcular saldo actual
+    interes = db_prestamo.monto * 0.20
+    total_credito = db_prestamo.monto + interes
+    pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == db_prestamo.id).all()
+    total_abonos = sum(pg.monto for pg in pagos)
+    saldo = round(total_credito - total_abonos, 2)
+    if saldo > 0:
+        # Registrar pago por el saldo restante
+        db_pago = models.Pago(
+            prestamo_id=prestamo_id,
+            monto=saldo,
+            fecha=fecha,
+            motivo_no_pago=None
+        )
+        db.add(db_pago)
+        db.commit()
+        db.refresh(db_pago)
+    # Marcar préstamo como pagado
+    db_prestamo.estado = 'pagado'
+    db.commit()
+    return {"success": True, "prestamo_id": prestamo_id}
 
 @router.get("/")
 def list_pagos():
