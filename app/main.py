@@ -118,8 +118,34 @@ def reporte_diario(db: Session = Depends(get_db)):
 			   "prestado_dia": prestado_dia,
 			   "gastos_dia": gastos_dia,
 			   "caja_actual": caja_actual,
-			   "clientes_nuevos": clientes_nuevos
+			"clientes_nuevos": clientes_nuevos
 	   }
+
+	# Endpoint para clientes nuevos del día y semana
+	from fastapi.responses import JSONResponse
+	from datetime import timedelta
+	from fastapi import Query
+
+	@app.get("/clientes/nuevos")
+	def clientes_nuevos(
+		db: Session = Depends(get_db),
+		periodo: str = Query('dia', enum=['dia', 'semana'])
+	):
+		hoy = date.today()
+		if periodo == 'semana':
+			inicio_semana = hoy - timedelta(days=hoy.weekday())
+			clientes = db.query(models.Cliente).filter(models.Cliente.creado_en >= inicio_semana).all()
+		else:
+			clientes = db.query(models.Cliente).filter(models.Cliente.creado_en == hoy).all()
+		resultado = [
+			{
+				"id": c.id,
+				"nombre": c.nombre,
+				"fecha": c.creado_en.isoformat() if c.creado_en else None
+			}
+			for c in clientes
+		]
+		return JSONResponse(resultado)
 
 @app.get("/ping")
 def ping():
