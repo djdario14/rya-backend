@@ -85,6 +85,7 @@ class RecordatorioOut(RecordatorioBase):
     id: int
     cliente_id: int
     creado_en: datetime
+    cliente_nombre: str | None = None
 
     class Config:
         orm_mode = True

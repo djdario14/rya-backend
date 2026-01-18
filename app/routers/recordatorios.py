@@ -33,8 +33,13 @@ def listar_recordatorios(cliente_id: int, db: Session = Depends(get_db)):
 def recordatorios_pendientes(db: Session = Depends(get_db)):
     ahora = datetime.now()
     recs = db.query(models.Recordatorio).filter(models.Recordatorio.fecha <= ahora, models.Recordatorio.leido == 0).order_by(models.Recordatorio.fecha.asc()).all()
-    # Enriquecer con nombre de cliente si está disponible
-    return recs
+    enriched = []
+    for r in recs:
+        item = schemas.RecordatorioOut.from_orm(r)
+        if r.cliente:
+            item.cliente_nombre = r.cliente.nombre
+        enriched.append(item)
+    return enriched
 
 @router.post("/marcar_leido/{recordatorio_id}")
 def marcar_recordatorio_leido(recordatorio_id: int, db: Session = Depends(get_db)):
