@@ -1,30 +1,11 @@
-@app.get("/prestamos/dia")
-def prestamos_del_dia(db: Session = Depends(get_db)):
-	hoy = date.today()
-	prestamos = db.query(models.Prestamo).filter(models.Prestamo.fecha == hoy).all()
-	resultados = []
-	for prestamo in prestamos:
-		cliente = db.query(models.Cliente).filter(models.Cliente.id == prestamo.cliente_id).first()
-		interes = round(prestamo.monto * 0.20)
-		cuotas = 30  # Asumido fijo, ajusta si es variable
-		resultados.append({
-			"fecha": prestamo.fecha.strftime("%A, %d %B %Y, %I:%M:%S %p"),
-			"nombre": cliente.nombre if cliente else None,
-			"valor": int(prestamo.monto),
-			"interes": interes,
-			"cuotas": cuotas
-		})
-	return resultados
-
 
 from fastapi.responses import JSONResponse
 # Redeploy trigger
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from .database import get_db
+from .database import get_db, SessionLocal
 from datetime import date
 from . import models
-
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,6 +29,22 @@ def pagos_del_dia(db: Session = Depends(get_db)):
 		})
 	return JSONResponse(resultados)
 
+
+app.add_middleware(
+       CORSMiddleware,
+       allow_origins=[
+	       "https://rya-cobranza.vercel.app",
+	       "https://rya-git-main-djdario14s-projects.vercel.app",
+	       "https://rya-fronted.vercel.app",
+	       "http://localhost:3000",
+	       "http://127.0.0.1:3000",
+	       "https://rya-backend-production.up.railway.app"
+       ],
+       allow_credentials=True,
+       allow_methods=["*"],
+       allow_headers=["*"],
+)
+
 @app.get("/prestamos/dia")
 def prestamos_del_dia(db: Session = Depends(get_db)):
 	hoy = date.today()
@@ -66,27 +63,20 @@ def prestamos_del_dia(db: Session = Depends(get_db)):
 		})
 	return resultados
 
-app.add_middleware(
-	CORSMiddleware,
-	allow_origins=[
-		"https://rya-cobranza.vercel.app",
-		"https://rya-git-main-djdario14s-projects.vercel.app",
-		"https://rya-fronted.vercel.app",
-		"http://localhost:3000",
-		"http://127.0.0.1:3000",
-		"https://rya-backend-production.up.railway.app"
-	],
-	allow_credentials=True,
-	allow_methods=["*"],
-	allow_headers=["*"],
-)
-
-
-from sqlalchemy.orm import Session
-from fastapi import Depends
-from .database import get_db, SessionLocal
-from datetime import date
-from . import models
+@app.get("/pagos/dia")
+def pagos_del_dia(db: Session = Depends(get_db)):
+	hoy = date.today()
+	pagos = db.query(models.Pago).filter(models.Pago.fecha == hoy, models.Pago.monto > 0).all()
+	resultados = []
+	for pago in pagos:
+		prestamo = db.query(models.Prestamo).filter(models.Prestamo.id == pago.prestamo_id).first()
+		cliente = db.query(models.Cliente).filter(models.Cliente.id == prestamo.cliente_id).first() if prestamo else None
+		resultados.append({
+			"fecha": pago.fecha.strftime("%Y-%m-%d"),
+			"nombre": cliente.nombre if cliente else None,
+			"valor": pago.monto
+		})
+	return JSONResponse(resultados)
 
 @app.get("/reporte/diario")
 def reporte_diario(db: Session = Depends(get_db)):
@@ -121,42 +111,42 @@ def reporte_diario(db: Session = Depends(get_db)):
 	return {
 		"clientes_con_abono": len(clientes_con_abono),
 		"total_clientes": total_clientes,
-		"porcentaje_abono": porcentaje_abono,
-		"total_a_cobrar": round(total_a_cobrar, 2),
-		"caja_inicial": caja_inicial,
-		"cobrado_dia": cobrado_dia,
-		"prestado_dia": prestado_dia,
-		"gastos_dia": gastos_dia,
-		"caja_actual": caja_actual,
-		"clientes_nuevos": clientes_nuevos
-	}
+			   "porcentaje_abono": porcentaje_abono,
+			   "total_a_cobrar": round(total_a_cobrar, 2),
+			   "caja_inicial": caja_inicial,
+			   "cobrado_dia": cobrado_dia,
+			   "prestado_dia": prestado_dia,
+			   "gastos_dia": gastos_dia,
+			   "caja_actual": caja_actual,
+			   "clientes_nuevos": clientes_nuevos
+	   }
 
 @app.get("/ping")
 def ping():
-    return {"message": "pong"}
+	return {"message": "pong"}
 
 @app.get("/clientes/{cliente_id}/prestamos")
 def prestamos_direct(cliente_id: int):
-    db = SessionLocal()
-    try:
-        prestamos = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id).order_by(models.Prestamo.fecha.desc()).all()
-        prestamos_list = []
-        for p in prestamos:
-            interes = p.monto * 0.20
-            total_credito = p.monto + interes
-            pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == p.id).all()
-            total_abonos = sum(pg.monto for pg in pagos)
-            saldo = round(total_credito - total_abonos, 2)
-            prestamos_list.append({
-                "id": p.id,
-                "saldo": saldo,
-                "valor": p.monto,
-                "fecha": p.fecha,
-                "estado": p.estado
-            })
-        return prestamos_list
-    finally:
-        db.close()
+	db = SessionLocal()
+	try:
+		prestamos = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id).order_by(models.Prestamo.fecha.desc()).all()
+		prestamos_list = []
+		for p in prestamos:
+			interes = p.monto * 0.20
+			total_credito = p.monto + interes
+			pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == p.id).all()
+			total_abonos = sum(pg.monto for pg in pagos)
+			saldo = round(total_credito - total_abonos, 2)
+			prestamos_list.append({
+				"id": p.id,
+				"saldo": saldo,
+				"valor": p.monto,
+				"fecha": p.fecha,
+				"estado": p.estado
+			})
+		return prestamos_list
+	finally:
+		db.close()
 
 app.include_router(clientes.router)
 app.include_router(prestamos.router)
