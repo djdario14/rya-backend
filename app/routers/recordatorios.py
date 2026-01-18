@@ -1,3 +1,11 @@
+@router.post("/marcar_leido/{recordatorio_id}")
+def marcar_recordatorio_leido(recordatorio_id: int, db: Session = Depends(get_db)):
+    rec = db.query(models.Recordatorio).filter(models.Recordatorio.id == recordatorio_id).first()
+    if not rec:
+        raise HTTPException(status_code=404, detail="Recordatorio no encontrado")
+    rec.leido = 1
+    db.commit()
+    return {"ok": True}
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -31,7 +39,7 @@ def listar_recordatorios(cliente_id: int, db: Session = Depends(get_db)):
 @router.get("/pendientes", response_model=list[schemas.RecordatorioOut])
 def recordatorios_pendientes(db: Session = Depends(get_db)):
     ahora = datetime.now()
-    recs = db.query(models.Recordatorio).filter(models.Recordatorio.fecha <= ahora).order_by(models.Recordatorio.fecha.asc()).all()
+    recs = db.query(models.Recordatorio).filter(models.Recordatorio.fecha <= ahora, models.Recordatorio.leido == 0).order_by(models.Recordatorio.fecha.asc()).all()
     # Enriquecer con nombre de cliente si está disponible
     for r in recs:
         if hasattr(r, 'cliente') and r.cliente:

@@ -54,5 +54,6 @@ class Recordatorio(Base):
     fecha = Column(DateTime, nullable=False)
     nota = Column(String, nullable=True)
     creado_en = Column(DateTime, default=datetime.datetime.utcnow)
+    leido = Column(Integer, default=0)  # 0 = no leído, 1 = leído
 
     cliente = relationship("Cliente", back_populates="recordatorios")
