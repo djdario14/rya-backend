@@ -1,3 +1,19 @@
+from fastapi.responses import JSONResponse
+# Endpoint para pagos del día
+@app.get("/pagos/dia")
+def pagos_del_dia(db: Session = Depends(get_db)):
+	hoy = date.today()
+	pagos = db.query(models.Pago).filter(models.Pago.fecha == hoy, models.Pago.monto > 0).all()
+	resultados = []
+	for pago in pagos:
+		prestamo = db.query(models.Prestamo).filter(models.Prestamo.id == pago.prestamo_id).first()
+		cliente = db.query(models.Cliente).filter(models.Cliente.id == prestamo.cliente_id).first() if prestamo else None
+		resultados.append({
+			"fecha": pago.fecha.strftime("%Y-%m-%d"),
+			"nombre": cliente.nombre if cliente else None,
+			"valor": pago.monto
+		})
+	return JSONResponse(resultados)
 # Redeploy trigger
 
 from fastapi import FastAPI
