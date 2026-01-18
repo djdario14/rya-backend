@@ -3,12 +3,14 @@ from typing import List, Optional
 from datetime import date, datetime
 
 
+
 class ClienteBase(BaseModel):
     nombre: str
     cedula: str
     direccion: str
     negocio: str
     telefono: str
+    ubicacion: str | None = None
 
 class ClienteCreate(ClienteBase):
     pass

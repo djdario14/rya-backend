@@ -137,14 +137,23 @@ def clientes_nuevos(
 		clientes = db.query(models.Cliente).filter(models.Cliente.creado_en >= inicio_semana).all()
 	else:
 		clientes = db.query(models.Cliente).filter(models.Cliente.creado_en == hoy).all()
-	resultado = [
-		{
+	resultado = []
+	for c in clientes:
+		# Si ubicacion está vacía, usar dirección como coordenadas GPS
+		if c.ubicacion:
+			ubicacion_url = c.ubicacion
+		elif c.direccion and ',' in c.direccion:
+			# Construir enlace de Google Maps
+			coords = c.direccion.replace(' ', '')
+			ubicacion_url = f"https://www.google.com/maps/search/?api=1&query={coords}"
+		else:
+			ubicacion_url = None
+		resultado.append({
 			"id": c.id,
 			"nombre": c.nombre,
-			"fecha": c.creado_en.isoformat() if c.creado_en else None
-		}
-		for c in clientes
-	]
+			"fecha": c.creado_en.isoformat() if c.creado_en else None,
+			"ubicacion": ubicacion_url
+		})
 	return JSONResponse(resultado)
 
 @app.get("/ping")
