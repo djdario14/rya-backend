@@ -13,15 +13,6 @@ def get_db():
     finally:
         db.close()
 
-router = APIRouter(prefix="/recordatorios", tags=["recordatorios"])
-
-def get_db():
-    db = database.SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 @router.post("/", response_model=schemas.RecordatorioOut)
 def crear_recordatorio(recordatorio: schemas.RecordatorioCreate, cliente_id: int, db: Session = Depends(get_db)):
     db_recordatorio = models.Recordatorio(
@@ -53,7 +44,3 @@ def marcar_recordatorio_leido(recordatorio_id: int, db: Session = Depends(get_db
     rec.leido = 1
     db.commit()
     return {"ok": True}
-    for r in recs:
-        if hasattr(r, 'cliente') and r.cliente:
-            r.cliente_nombre = r.cliente.nombre
-    return recs
