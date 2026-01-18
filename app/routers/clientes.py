@@ -53,7 +53,7 @@ def get_cliente_saldo(cliente_id: int):
     try:
         prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.id.desc()).first()
         if not prestamo:
-            return {"saldo": 0.0, "prestamo": 0.0, "cuotasTotal": 0, "cuotasPagadas": 0, "atraso": 0}
+            return {"saldo": 0.0, "prestamo": 0.0, "cuotasTotal": 0, "cuotasPagadas": 0, "atraso": 0, "fecha_prestamo": None}
 
         monto = prestamo.monto
         # Interés: 20% fijo (puedes cambiar esto si lo guardas en la BD)
@@ -84,7 +84,8 @@ def get_cliente_saldo(cliente_id: int):
             "prestamo": monto,
             "cuotasTotal": cuotas_total,
             "cuotasPagadas": cuotas_pagadas,
-            "atraso": atraso
+            "atraso": atraso,
+            "fecha_prestamo": prestamo.fecha.isoformat() if prestamo.fecha else None
         }
     finally:
         db.close()
