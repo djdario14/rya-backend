@@ -1,5 +1,5 @@
 from fastapi.responses import JSONResponse
-# Endpoint para pagos del día
+# Redeploy trigger
 @app.get("/pagos/dia")
 def pagos_del_dia(db: Session = Depends(get_db)):
 	hoy = date.today()
@@ -14,7 +14,6 @@ def pagos_del_dia(db: Session = Depends(get_db)):
 			"valor": pago.monto
 		})
 	return JSONResponse(resultados)
-# Redeploy trigger
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
