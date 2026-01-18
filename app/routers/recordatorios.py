@@ -30,8 +30,8 @@ def listar_recordatorios(cliente_id: int, db: Session = Depends(get_db)):
 
 @router.get("/pendientes", response_model=list[schemas.RecordatorioOut])
 def recordatorios_pendientes(db: Session = Depends(get_db)):
-    hoy = datetime.now()
-    recs = db.query(models.Recordatorio).filter(models.Recordatorio.fecha >= hoy).order_by(models.Recordatorio.fecha.asc()).all()
+    ahora = datetime.now()
+    recs = db.query(models.Recordatorio).filter(models.Recordatorio.fecha <= ahora).order_by(models.Recordatorio.fecha.asc()).all()
     # Enriquecer con nombre de cliente si está disponible
     for r in recs:
         if hasattr(r, 'cliente') and r.cliente:
