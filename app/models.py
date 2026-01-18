@@ -11,6 +11,7 @@ class Cliente(Base):
     direccion = Column(String, nullable=False)
     negocio = Column(String, nullable=False)
     telefono = Column(String, nullable=False)
+    creado_en = Column(Date, default=datetime.date.today, nullable=False)
     prestamos = relationship('Prestamo', back_populates='cliente')
     recordatorios = relationship("Recordatorio", back_populates="cliente", cascade="all, delete-orphan")
 

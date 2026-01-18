@@ -55,6 +55,10 @@ def reporte_diario(db: Session = Depends(get_db)):
 	gastos_dia = sum(g.monto for g in db.query(models.Gasto).filter(models.Gasto.fecha == hoy).all())
 	# Caja actual
 	caja_actual = caja_inicial + cobrado_dia - gastos_dia - prestado_dia
+
+	# Clientes nuevos hoy
+	clientes_nuevos = db.query(models.Cliente).filter(models.Cliente.creado_en == hoy).count()
+
 	return {
 		"clientes_con_abono": len(clientes_con_abono),
 		"total_clientes": total_clientes,
@@ -64,7 +68,8 @@ def reporte_diario(db: Session = Depends(get_db)):
 		"cobrado_dia": cobrado_dia,
 		"prestado_dia": prestado_dia,
 		"gastos_dia": gastos_dia,
-		"caja_actual": caja_actual
+		"caja_actual": caja_actual,
+		"clientes_nuevos": clientes_nuevos
 	}
 
 @app.get("/ping")

@@ -143,12 +143,14 @@ def get_cliente(cliente_id: int):
 @router.post("/", response_model=schemas.Cliente)
 def create_cliente(cliente: schemas.ClienteBase):
     db = database.SessionLocal()
+    import datetime
     db_cliente = models.Cliente(
         nombre=cliente.nombre,
         cedula=cliente.cedula,
         direccion=cliente.direccion,
         negocio=cliente.negocio,
-        telefono=cliente.telefono
+        telefono=cliente.telefono,
+        creado_en=datetime.date.today()
     )
     db.add(db_cliente)
     db.commit()
