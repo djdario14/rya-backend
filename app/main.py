@@ -1,5 +1,11 @@
+
 from fastapi.responses import JSONResponse
 # Redeploy trigger
+from sqlalchemy.orm import Session
+from fastapi import Depends
+from .database import get_db
+from datetime import date
+from . import models
 @app.get("/pagos/dia")
 def pagos_del_dia(db: Session = Depends(get_db)):
 	hoy = date.today()
