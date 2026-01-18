@@ -1,4 +1,5 @@
 
+
 from fastapi.responses import JSONResponse
 # Redeploy trigger
 from sqlalchemy.orm import Session
@@ -6,6 +7,14 @@ from fastapi import Depends
 from .database import get_db
 from datetime import date
 from . import models
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from .routers import clientes, prestamos, pagos, usuarios, gastos, recordatorios
+
+
+app = FastAPI()
 @app.get("/pagos/dia")
 def pagos_del_dia(db: Session = Depends(get_db)):
 	hoy = date.today()
@@ -20,13 +29,6 @@ def pagos_del_dia(db: Session = Depends(get_db)):
 			"valor": pago.monto
 		})
 	return JSONResponse(resultados)
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-from .routers import clientes, prestamos, pagos, usuarios, gastos, recordatorios
-
-app = FastAPI()
 
 app.add_middleware(
 	CORSMiddleware,
