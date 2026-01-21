@@ -16,7 +16,8 @@ app.add_middleware(
 		"https://rya-fronted.vercel.app",
 		"http://localhost:3000",
 		"http://127.0.0.1:3000",
-		"https://rya-backend-production.up.railway.app"
+		"https://rya-backend-production.up.railway.app",
+		"https://rya-cobranza.netlify.app"  # <--- Agregado dominio de Netlify
 	],
 	allow_credentials=True,
 	allow_methods=["*"],
