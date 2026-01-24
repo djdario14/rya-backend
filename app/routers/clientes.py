@@ -1,12 +1,8 @@
-
 from fastapi import APIRouter, HTTPException
+router = APIRouter(prefix="/clientes", tags=["clientes"])
 from sqlalchemy.orm import Session
 from .. import models, schemas, database
 from sqlalchemy import func
-
-router = APIRouter(prefix="/clientes", tags=["clientes"])
-
-
 
 # --- ENDPOINTS FIJOS ANTES DE LOS DINÁMICOS ---
 from typing import List
