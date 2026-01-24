@@ -19,6 +19,11 @@ class Prestamo(Base):
     monto = Column(Float)
     fecha = Column(Date)
     estado = Column(String, nullable=False, default='activo')
+    interes = Column(Float, nullable=False, default=0)
+    total = Column(Float, nullable=False, default=0)
+    cuotas = Column(Integer, nullable=False, default=0)
+    valor_cuota = Column(Float, nullable=False, default=0)
+    forma_pago = Column(String, nullable=False, default='Diario')
     cliente = relationship('Cliente', back_populates='prestamos')
     pagos = relationship('Pago', back_populates='prestamo')
 

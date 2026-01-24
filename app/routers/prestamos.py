@@ -21,7 +21,12 @@ def create_prestamo(prestamo: schemas.PrestamoCreate, db: Session = Depends(get_
             cliente_id=prestamo.cliente_id,
             monto=prestamo.monto,
             fecha=prestamo.fecha,
-            estado=getattr(prestamo, 'estado', 'activo')
+            estado=getattr(prestamo, 'estado', 'activo'),
+            interes=prestamo.interes,
+            total=prestamo.total,
+            cuotas=prestamo.cuotas,
+            valor_cuota=prestamo.valor_cuota,
+            forma_pago=prestamo.forma_pago
         )
         db.add(db_prestamo)
         db.commit()

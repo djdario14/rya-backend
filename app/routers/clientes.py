@@ -6,13 +6,31 @@ from sqlalchemy import func
 
 router = APIRouter(prefix="/clientes", tags=["clientes"])
 
-@router.get("/")
-def list_clientes():
+
+# Nuevo endpoint que devuelve clientes con saldo calculado
+from typing import List
+@router.get("/con-saldo", response_model=List[schemas.ClienteConSaldo])
+def list_clientes_con_saldo():
     db = database.SessionLocal()
     try:
         clientes = db.query(models.Cliente).all()
-        # Devuelve id y nombre
-        return [{"id": c.id, "nombre": c.nombre} for c in clientes]
+        clientes_con_saldo = []
+        for cliente in clientes:
+            # Préstamos activos del cliente
+            prestamos = db.query(models.Prestamo).filter(
+                models.Prestamo.cliente_id == cliente.id,
+                models.Prestamo.estado == "activo"
+            ).all()
+            monto_total = sum(p.monto + p.interes for p in prestamos)
+            pagos = db.query(models.Pago).filter(
+                models.Pago.prestamo_id.in_([p.id for p in prestamos])
+            ).all() if prestamos else []
+            total_pagado = sum(p.monto for p in pagos)
+            saldo = monto_total - total_pagado
+            cliente_dict = cliente.__dict__.copy()
+            cliente_dict["saldo"] = saldo
+            clientes_con_saldo.append(cliente_dict)
+        return clientes_con_saldo
     finally:
         db.close()
 

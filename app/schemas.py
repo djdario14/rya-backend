@@ -1,3 +1,16 @@
+
+# --- Cliente con saldo para endpoint especial ---
+class ClienteConSaldo(BaseModel):
+    id: int
+    nombre: str
+    cedula: str
+    direccion: str
+    negocio: str
+    telefono: str
+    saldo: float
+
+    class Config:
+        from_attributes = True
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
@@ -22,6 +35,11 @@ class PrestamoBase(BaseModel):
     monto: float
     fecha: date
     estado: str = 'activo'
+    interes: float = 0
+    total: float = 0
+    cuotas: int = 0
+    valor_cuota: float = 0
+    forma_pago: str = 'Diario'
 
 class PrestamoCreate(PrestamoBase):
     cliente_id: int
