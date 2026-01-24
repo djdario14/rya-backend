@@ -1,3 +1,10 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from ..database import get_db
+from .. import models, schemas
+
+router = APIRouter()
+
 @router.get("/activo/{cliente_id}")
 def get_prestamo_activo(cliente_id: int, db: Session = Depends(get_db)):
     prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.id.desc()).first()
