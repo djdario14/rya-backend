@@ -1,3 +1,6 @@
+@router.get("/", response_model=list[schemas.Gasto])
+def get_gastos_all(db: Session = Depends(get_db)):
+    return db.query(models.Gasto).order_by(models.Gasto.fecha.desc()).all()
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import get_db
