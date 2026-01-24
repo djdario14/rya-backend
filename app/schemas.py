@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 
 # --- Cliente con saldo para endpoint especial ---
 class ClienteConSaldo(BaseModel):
