@@ -22,22 +22,6 @@ def get_prestamo_activo(cliente_id: int, db: Session = Depends(get_db)):
         "valor_cuota": prestamo.valor_cuota,
         "forma_pago": prestamo.forma_pago
     }
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from ..database import get_db
-from .. import models, schemas
-
-router = APIRouter(prefix="/prestamos", tags=["prestamos"])
-
-@router.get("/")
-def list_prestamos():
-    return ["prestamo1", "prestamo2"]
-
-# Nuevo endpoint para crear préstamos
-@router.post("/", response_model=schemas.Prestamo)
-def create_prestamo(prestamo: schemas.PrestamoCreate, db: Session = Depends(get_db)):
-    import traceback
-    db_cliente = db.query(models.Cliente).filter(models.Cliente.id == prestamo.cliente_id).first()
     if not db_cliente:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     try:
