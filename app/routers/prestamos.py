@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models, schemas
 
-router = APIRouter()
+router = APIRouter(prefix="/prestamos", tags=["prestamos"])
 
 @router.get("/activo/{cliente_id}")
 def get_prestamo_activo(cliente_id: int, db: Session = Depends(get_db)):
