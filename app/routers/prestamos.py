@@ -17,13 +17,14 @@ def create_prestamo(prestamo: schemas.PrestamoCreate, db: Session = Depends(get_
     if not db_cliente:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     try:
+        total = prestamo.monto + prestamo.interes
         db_prestamo = models.Prestamo(
             cliente_id=prestamo.cliente_id,
             monto=prestamo.monto,
             fecha=prestamo.fecha,
             estado=getattr(prestamo, 'estado', 'activo'),
             interes=prestamo.interes,
-            total=prestamo.total,
+            total=total,
             cuotas=prestamo.cuotas,
             valor_cuota=prestamo.valor_cuota,
             forma_pago=prestamo.forma_pago
