@@ -1,6 +1,4 @@
-@router.get("/", response_model=list[schemas.Gasto])
-def get_gastos_all(db: Session = Depends(get_db)):
-    return db.query(models.Gasto).order_by(models.Gasto.fecha.desc()).all()
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import get_db
@@ -8,6 +6,10 @@ from .. import models, schemas
 from datetime import date, timedelta
 
 router = APIRouter(prefix="/gastos", tags=["gastos"])
+
+@router.get("/", response_model=list[schemas.Gasto])
+def get_gastos_all(db: Session = Depends(get_db)):
+    return db.query(models.Gasto).order_by(models.Gasto.fecha.desc()).all()
 
 @router.get("/semana", response_model=list[schemas.Gasto])
 def get_gastos_semana(db: Session = Depends(get_db)):
