@@ -1,3 +1,20 @@
+@router.get("/activo/{cliente_id}")
+def get_prestamo_activo(cliente_id: int, db: Session = Depends(get_db)):
+    prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.id.desc()).first()
+    if not prestamo:
+        return {}
+    return {
+        "id": prestamo.id,
+        "cliente_id": prestamo.cliente_id,
+        "monto": prestamo.monto,
+        "fecha": prestamo.fecha,
+        "estado": prestamo.estado,
+        "interes": prestamo.interes,
+        "total": prestamo.total,
+        "cuotas": prestamo.cuotas,
+        "valor_cuota": prestamo.valor_cuota,
+        "forma_pago": prestamo.forma_pago
+    }
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import get_db
