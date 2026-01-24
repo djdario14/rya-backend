@@ -7,7 +7,8 @@ from sqlalchemy import func
 router = APIRouter(prefix="/clientes", tags=["clientes"])
 
 
-# Nuevo endpoint que devuelve clientes con saldo calculado
+
+# --- ENDPOINTS FIJOS ANTES DE LOS DINÁMICOS ---
 from typing import List
 @router.get("/con-saldo", response_model=List[schemas.ClienteConSaldo])
 def list_clientes_con_saldo():
@@ -34,7 +35,10 @@ def list_clientes_con_saldo():
     finally:
         db.close()
 
-# Nuevo endpoint para obtener saldo de un cliente
+# --- ENDPOINTS DINÁMICOS AL FINAL ---
+
+
+# --- ENDPOINTS DINÁMICOS AL FINAL ---
 @router.get("/{cliente_id}/saldo")
 def get_cliente_saldo(cliente_id: int):
     db = database.SessionLocal()
@@ -77,7 +81,6 @@ def get_cliente_saldo(cliente_id: int):
     finally:
         db.close()
 
-# Endpoint para obtener un cliente por id
 @router.get("/{cliente_id}", response_model=schemas.Cliente)
 def get_cliente(cliente_id: int):
     db = database.SessionLocal()
@@ -88,13 +91,6 @@ def get_cliente(cliente_id: int):
         return cliente
     finally:
         db.close()
-@router.get("/{cliente_id}", response_model=schemas.Cliente)
-def get_cliente(cliente_id: int):
-    db = database.SessionLocal()
-    cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
-    if not cliente:
-        raise HTTPException(status_code=404, detail="Cliente no encontrado")
-    return cliente
 
     monto = prestamo.monto
     # Interés: 20% fijo (puedes cambiar esto si lo guardas en la BD)
