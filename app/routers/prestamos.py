@@ -67,7 +67,6 @@ def prestamos_hoy_detalle(db: Session = Depends(get_db)):
             "valor_cuota": p.valor_cuota
         })
     return resultado
-        return {}
     return {
         "id": prestamo.id,
         "cliente_id": prestamo.cliente_id,
