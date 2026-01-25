@@ -3,6 +3,29 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models, schemas
+from datetime import date, timedelta, datetime, timezone
+
+router = APIRouter(prefix="/gastos", tags=["gastos"])
+
+
+# Endpoint para gastos del día según zona horaria del usuario
+@router.get("/del-dia", response_model=list[schemas.Gasto])
+def get_gastos_del_dia(offset: int = 0, db: Session = Depends(get_db)):
+    """
+    offset: minutos de diferencia respecto a UTC (ejemplo: -300 para UTC-5)
+    """
+    now_utc = datetime.utcnow()
+    user_now = now_utc + timedelta(minutes=offset)
+    user_today = user_now.date()
+    start = datetime.combine(user_today, datetime.min.time()) - timedelta(minutes=offset)
+    end = datetime.combine(user_today, datetime.max.time()) - timedelta(minutes=offset)
+    gastos = db.query(models.Gasto).filter(models.Gasto.fecha >= start.date(), models.Gasto.fecha <= end.date()).order_by(models.Gasto.fecha.desc()).all()
+    return gastos
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from ..database import get_db
+from .. import models, schemas
 from datetime import date, timedelta
 
 router = APIRouter(prefix="/gastos", tags=["gastos"])
