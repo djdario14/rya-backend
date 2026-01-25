@@ -2,6 +2,7 @@ def prestamos_hoy_detalle(db: Session = Depends(get_db)):
     hoy = date.today()
     prestamos = db.query(models.Prestamo, models.Cliente).join(models.Cliente, models.Prestamo.cliente_id == models.Cliente.id)
     prestamos = prestamos.filter(func.date(models.Prestamo.fecha) == hoy).all()
+    resultado = []
     for p, c in prestamos:
         resultado.append({
             "cliente": c.nombre,
