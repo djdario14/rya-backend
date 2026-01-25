@@ -35,8 +35,10 @@ def suma_prestamos_hoy(db: Session = Depends(get_db)):
 
 @router.get("/activo/{cliente_id}")
 def get_prestamo_activo(cliente_id: int, db: Session = Depends(get_db)):
+# ...existing code...
     prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.id.desc()).first()
     if not prestamo:
+        raise HTTPException(status_code=404, detail="No hay préstamo activo para este cliente")
 # Mover la definición de router antes de su uso
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
