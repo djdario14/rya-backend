@@ -24,6 +24,7 @@ def get_prestamo_activo(cliente_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No hay préstamo activo para este cliente")
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from fastapi import Depends
 from sqlalchemy import func
 from datetime import date
 from ..database import get_db
