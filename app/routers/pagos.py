@@ -25,6 +25,20 @@ def suma_pagos_hoy(db: Session = Depends(get_db)):
     total = sum([p[0] for p in suma])
     return {"total": total}
 
+# Endpoint para detalle de pagos de hoy (cliente y monto)
+@router.get("/hoy-detalle")
+def pagos_hoy_detalle(db: Session = Depends(get_db)):
+    hoy = date.today()
+    pagos = (
+        db.query(models.Pago, models.Prestamo, models.Cliente)
+        .join(models.Prestamo, models.Pago.prestamo_id == models.Prestamo.id)
+        .join(models.Cliente, models.Prestamo.cliente_id == models.Cliente.id)
+        .filter(func.date(models.Pago.fecha) == hoy)
+        .with_entities(models.Cliente.nombre, models.Pago.monto)
+        .all()
+    )
+    return [{"cliente": nombre, "monto": monto} for nombre, monto in pagos]
+
 @router.get("/")
 def list_pagos():
     return ["pago1", "pago2"]
