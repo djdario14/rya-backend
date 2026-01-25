@@ -10,12 +10,12 @@ import traceback
 
 router = APIRouter(prefix="/prestamos", tags=["prestamos"])
 
-# Endpoint para suma de préstamos de hoy (monto + interes)
+# Endpoint para suma de préstamos de hoy (solo monto)
 @router.get("/suma-hoy")
 def suma_prestamos_hoy(db: Session = Depends(get_db)):
     hoy = date.today()
     prestamos = db.query(models.Prestamo).filter(func.date(models.Prestamo.fecha) == hoy).all()
-    total = sum([(p.monto or 0) + (p.interes or 0) for p in prestamos])
+    total = sum([(p.monto or 0) for p in prestamos])
     return {"total": total}
 
 @router.get("/activo/{cliente_id}")
