@@ -35,6 +35,60 @@ def prestamos_hoy_detalle(db: Session = Depends(get_db)):
         })
     return resultado
 
+
+# Endpoint para registrar un nuevo préstamo
+from fastapi import Body
+from datetime import datetime
+
+@router.post("/")
+def crear_prestamo(
+    cliente_id: int = Body(...),
+    monto: float = Body(...),
+    fecha: str = Body(...),
+    estado: str = Body(...),
+    interes: float = Body(...),
+    total: float = Body(...),
+    cuotas: int = Body(...),
+    valor_cuota: float = Body(...),
+    forma_pago: str = Body(...),
+    db: Session = Depends(get_db)
+):
+    try:
+        # Validar cliente
+        cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
+        if not cliente:
+            raise HTTPException(status_code=404, detail="Cliente no encontrado")
+        # Crear préstamo
+        prestamo = models.Prestamo(
+            cliente_id=cliente_id,
+            monto=monto,
+            fecha=datetime.strptime(fecha, "%Y-%m-%d"),
+            estado=estado,
+            interes=interes,
+            total=total,
+            cuotas=cuotas,
+            valor_cuota=valor_cuota,
+            forma_pago=forma_pago
+        )
+        db.add(prestamo)
+        db.commit()
+        db.refresh(prestamo)
+        return {
+            "id": prestamo.id,
+            "cliente_id": prestamo.cliente_id,
+            "monto": prestamo.monto,
+            "fecha": prestamo.fecha,
+            "estado": prestamo.estado,
+            "interes": prestamo.interes,
+            "total": prestamo.total,
+            "cuotas": prestamo.cuotas,
+            "valor_cuota": prestamo.valor_cuota,
+            "forma_pago": prestamo.forma_pago
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al crear préstamo: {str(e)}")
+
 # Endpoint para obtener préstamo activo de un cliente
 @router.get("/activo/{cliente_id}")
 def get_prestamo_activo(cliente_id: int, db: Session = Depends(get_db)):
@@ -50,4 +104,6 @@ def get_prestamo_activo(cliente_id: int, db: Session = Depends(get_db)):
         "interes": prestamo.interes,
         "total": prestamo.total,
         "cuotas": prestamo.cuotas,
+        "valor_cuota": prestamo.valor_cuota,
+        "forma_pago": prestamo.forma_pago
     }
