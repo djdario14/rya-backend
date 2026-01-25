@@ -1,3 +1,12 @@
+from sqlalchemy import func
+from datetime import date
+# Endpoint para suma de préstamos de hoy (monto + interes)
+@router.get("/suma-hoy")
+def suma_prestamos_hoy(db: Session = Depends(get_db)):
+    hoy = date.today()
+    prestamos = db.query(models.Prestamo).filter(func.date(models.Prestamo.fecha) == hoy).all()
+    total = sum([(p.monto or 0) + (p.interes or 0) for p in prestamos])
+    return {"total": total}
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import get_db
