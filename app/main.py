@@ -18,6 +18,9 @@ app.add_middleware(
 		"http://127.0.0.1:3000",
 		"https://rya-backend-production.up.railway.app",
 		"https://rya-cobranza.netlify.app"  # <--- Agregado dominio de Netlify
+        "https://localhost:3000",
+        "https://localhost:5173",
+        "http://localhost:5173",
 	],
 	allow_credentials=True,
 	allow_methods=["*"],
