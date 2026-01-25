@@ -14,13 +14,13 @@ app.add_middleware(
 		"https://rya-cobranza.vercel.app",
 		"https://rya-git-main-djdario14s-projects.vercel.app",
 		"https://rya-fronted.vercel.app",
+		"https://rya-backend-production.up.railway.app",
+		"https://rya-cobranza.netlify.app",
 		"http://localhost:3000",
 		"http://127.0.0.1:3000",
-		"https://rya-backend-production.up.railway.app",
-		"https://rya-cobranza.netlify.app"  # <--- Agregado dominio de Netlify
-        "https://localhost:3000",
-        "https://localhost:5173",
-        "http://localhost:5173",
+		"https://localhost:3000",
+		"https://localhost:5173",
+		"http://localhost:5173"
 	],
 	allow_credentials=True,
 	allow_methods=["*"],
