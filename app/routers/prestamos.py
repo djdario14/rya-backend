@@ -93,24 +93,3 @@ def prestamos_hoy_detalle(db: Session = Depends(get_db)):
             "valor_cuota": p.valor_cuota
         })
     return resultado
-    return {
-        "id": prestamo.id,
-        "cliente_id": prestamo.cliente_id,
-        "monto": prestamo.monto,
-        "fecha": prestamo.fecha,
-        "estado": prestamo.estado,
-        "interes": prestamo.interes,
-        "total": prestamo.total,
-        "cuotas": prestamo.cuotas,
-
-        from fastapi import APIRouter, Depends, HTTPException
-        from sqlalchemy.orm import Session
-        from sqlalchemy import func
-        from datetime import date
-        from ..database import get_db
-        from .. import models, schemas
-        from typing import List
-        import traceback
-
-        router = APIRouter(prefix="/prestamos", tags=["prestamos"])
-        total = prestamo.monto + prestamo.interes
