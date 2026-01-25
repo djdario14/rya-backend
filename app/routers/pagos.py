@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
+from datetime import date
 from ..database import get_db
 from .. import models, schemas
 
@@ -14,6 +16,14 @@ def get_pagos_by_cliente(cliente_id: int, db: Session = Depends(get_db)):
     for prestamo in prestamos:
         pagos += db.query(models.Pago).filter(models.Pago.prestamo_id == prestamo.id).all()
     return pagos
+
+# Endpoint para sumar pagos de hoy
+@router.get("/suma-hoy")
+def suma_pagos_hoy(db: Session = Depends(get_db)):
+    hoy = date.today()
+    suma = db.query(models.Pago).filter(func.date(models.Pago.fecha) == hoy).with_entities(models.Pago.monto).all()
+    total = sum([p[0] for p in suma])
+    return {"total": total}
 
 @router.get("/")
 def list_pagos():
