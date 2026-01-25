@@ -1,4 +1,3 @@
-# Endpoint para detalle de préstamos del día actual
 @router.get("/hoy-detalle")
 def prestamos_hoy_detalle(db: Session = Depends(get_db)):
     hoy = date.today()
@@ -38,6 +37,34 @@ def suma_prestamos_hoy(db: Session = Depends(get_db)):
 def get_prestamo_activo(cliente_id: int, db: Session = Depends(get_db)):
     prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.id.desc()).first()
     if not prestamo:
+# Mover la definición de router antes de su uso
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+from datetime import date
+from ..database import get_db
+from .. import models, schemas
+from typing import List
+import traceback
+
+router = APIRouter(prefix="/prestamos", tags=["prestamos"])
+
+# Endpoint para detalle de préstamos del día actual
+@router.get("/hoy-detalle")
+def prestamos_hoy_detalle(db: Session = Depends(get_db)):
+    hoy = date.today()
+    prestamos = db.query(models.Prestamo, models.Cliente).join(models.Cliente, models.Prestamo.cliente_id == models.Cliente.id)
+    prestamos = prestamos.filter(func.date(models.Prestamo.fecha) == hoy).all()
+    resultado = []
+    for p, c in prestamos:
+        resultado.append({
+            "cliente": c.nombre,
+            "monto": p.monto,
+            "forma_pago": p.forma_pago,
+            "cuotas": p.cuotas,
+            "valor_cuota": p.valor_cuota
+        })
+    return resultado
         return {}
     return {
         "id": prestamo.id,
