@@ -1,8 +1,26 @@
-from fastapi import APIRouter, HTTPException
-router = APIRouter(prefix="/clientes", tags=["clientes"])
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .. import models, schemas, database
 from sqlalchemy import func
+from typing import List
+
+router = APIRouter(prefix="/clientes", tags=["clientes"])
+
+# Endpoint para obtener los pagos registrados de un cliente (préstamo activo)
+@router.get("/{cliente_id}/pagos", response_model=list[schemas.Pago])
+def get_pagos_cliente(cliente_id: int):
+    db = database.SessionLocal()
+    try:
+        prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.id.desc()).first()
+        if not prestamo:
+            return []
+        pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == prestamo.id).order_by(models.Pago.fecha.asc()).all()
+        return pagos
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
 
 # --- ENDPOINTS FIJOS ANTES DE LOS DINÁMICOS ---
 from typing import List
@@ -24,8 +42,20 @@ def list_clientes_con_saldo():
             ).all() if prestamos else []
             total_pagado = sum(p.monto for p in pagos)
             saldo = monto_total - total_pagado
+            # Calcular la fecha del último pago (YYYY-MM-DD)
+            if pagos:
+                fechas_pago = [p.fecha for p in pagos if p.fecha is not None]
+                if fechas_pago:
+                    ultimo_pago = max(fechas_pago)
+                    if hasattr(ultimo_pago, 'isoformat'):
+                        ultimo_pago = ultimo_pago.isoformat()
+                else:
+                    ultimo_pago = None
+            else:
+                ultimo_pago = None
             cliente_dict = cliente.__dict__.copy()
             cliente_dict["saldo"] = saldo
+            cliente_dict["ultimo_pago"] = ultimo_pago
             clientes_con_saldo.append(cliente_dict)
         return clientes_con_saldo
     finally:
@@ -67,9 +97,13 @@ def get_cliente_saldo(cliente_id: int):
         # Si ya terminó de pagar, atraso es 0
         atraso = max(0, dias_sin_abono) if saldo > 0 else 0
 
+        valor_cuota = cuotas_total > 0 and total_credito / cuotas_total or 0
         return {
             "saldo": round(saldo, 2),
             "prestamo": monto,
+            "interes": round(interes, 2),
+            "total_credito": round(total_credito, 2),
+            "valor_cuota": round(valor_cuota, 2),
             "cuotasTotal": cuotas_total,
             "cuotasPagadas": cuotas_pagadas,
             "atraso": atraso,

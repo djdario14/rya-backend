@@ -9,6 +9,7 @@ class ClienteConSaldo(BaseModel):
     negocio: str
     telefono: str
     saldo: float
+    ultimo_pago: str | None = None
 
     class Config:
         from_attributes = True
