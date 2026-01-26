@@ -56,6 +56,8 @@ def list_clientes_con_saldo():
             cliente_dict = cliente.__dict__.copy()
             cliente_dict["saldo"] = saldo
             cliente_dict["ultimo_pago"] = ultimo_pago
+            # Agregar el estado del préstamo activo (si existe)
+            cliente_dict["estado"] = prestamos[0].estado if prestamos else None
             clientes_con_saldo.append(cliente_dict)
         return clientes_con_saldo
     finally:
