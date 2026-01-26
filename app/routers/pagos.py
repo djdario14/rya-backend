@@ -57,4 +57,13 @@ def create_pago(pago: schemas.PagoCreate, db: Session = Depends(get_db)):
     db.add(db_pago)
     db.commit()
     db.refresh(db_pago)
+
+    # Verificar si el saldo del préstamo llegó a 0 y actualizar estado a 'pagado'
+    pagos = db.query(models.Pago).filter(models.Pago.prestamo_id == pago.prestamo_id).all()
+    total_abonado = sum(p.monto for p in pagos)
+    saldo = (db_prestamo.total or 0) - total_abonado
+    if saldo <= 0 and db_prestamo.estado != 'pagado':
+        db_prestamo.estado = 'pagado'
+        db.commit()
+
     return db_pago
