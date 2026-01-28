@@ -1,3 +1,4 @@
+
 # Para PostgreSQL en Railway
 psycopg2-binary
 fastapi
@@ -7,3 +8,4 @@ pydantic
 python-dotenv
 passlib[bcrypt]
 jose
+alembic
