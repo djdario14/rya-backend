@@ -76,7 +76,7 @@ def get_clientes_nuevos_hoy():
         # Filtrar por fecha de creación igual a hoy (si existe el campo 'creado_en' en Cliente)
         # Si no existe, devolver vacío o todos
         if hasattr(models.Cliente, 'creado_en'):
-            clientes_hoy = [c for c in clientes if getattr(c, 'creado_en', None) == hoy]
+            clientes_hoy = [c for c in clientes if getattr(c, 'creado_en', None) and getattr(c, 'creado_en', None).strftime('%Y-%m-%d') == hoy.strftime('%Y-%m-%d')]
         else:
             clientes_hoy = []
         return clientes_hoy
