@@ -3,11 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models, schemas
-from datetime import date, timedelta, datetime, timezone
+from datetime import date, timedelta, datetime
 
 router = APIRouter(prefix="/gastos", tags=["gastos"])
-
-
 
 # Endpoint para gastos del día según zona horaria del usuario
 @router.get("/del-dia", response_model=list[schemas.Gasto])
@@ -21,13 +19,6 @@ def get_gastos_del_dia(offset: int = 0, db: Session = Depends(get_db)):
     gastos = db.query(models.Gasto).filter(models.Gasto.fecha == user_today).order_by(models.Gasto.fecha.desc()).all()
     return gastos
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from ..database import get_db
-from .. import models, schemas
-from datetime import date, timedelta
-
-router = APIRouter(prefix="/gastos", tags=["gastos"])
 
 @router.get("/", response_model=list[schemas.Gasto])
 def get_gastos_all(db: Session = Depends(get_db)):
