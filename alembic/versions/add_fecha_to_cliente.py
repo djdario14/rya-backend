@@ -1,8 +1,13 @@
 """
 Revision ID: add_fecha_to_cliente
-Revises: 
+Revises: None
 Create Date: 2026-01-27
 """
+
+revision = 'add_fecha_to_cliente'
+down_revision = 'add_motivo_no_pago_to_pagos'
+branch_labels = None
+depends_on = None
 from alembic import op
 import sqlalchemy as sa
 from datetime import date
