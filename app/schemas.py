@@ -1,3 +1,4 @@
+from datetime import date
 from pydantic import BaseModel
 
 # --- Cliente con saldo para endpoint especial ---
