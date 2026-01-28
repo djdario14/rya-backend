@@ -65,6 +65,24 @@ def list_clientes_con_saldo():
 
 # --- ENDPOINTS DINÁMICOS AL FINAL ---
 
+# Endpoint para obtener los clientes registrados hoy
+from datetime import date
+@router.get("/nuevos-hoy", response_model=list[schemas.Cliente])
+def get_clientes_nuevos_hoy():
+    db = database.SessionLocal()
+    try:
+        hoy = date.today()
+        clientes = db.query(models.Cliente).filter(models.Cliente.id != None).all()
+        # Filtrar por fecha de creación igual a hoy (si existe el campo 'fecha' en Cliente)
+        # Si no existe, devolver vacío o todos
+        if hasattr(models.Cliente, 'fecha'):
+            clientes_hoy = [c for c in clientes if getattr(c, 'fecha', None) == hoy]
+        else:
+            clientes_hoy = []
+        return clientes_hoy
+    finally:
+        db.close()
+
 
 # --- ENDPOINTS DINÁMICOS AL FINAL ---
 @router.get("/{cliente_id}/saldo")
@@ -109,7 +127,8 @@ def get_cliente_saldo(cliente_id: int):
             "cuotasTotal": cuotas_total,
             "cuotasPagadas": cuotas_pagadas,
             "atraso": atraso,
-            "fecha": prestamo.fecha.isoformat() if prestamo and prestamo.fecha else None
+            "fecha": prestamo.fecha.isoformat() if prestamo and prestamo.fecha else None,
+            "estado": prestamo.estado
         }
     finally:
         db.close()
@@ -159,13 +178,15 @@ def get_cliente(cliente_id: int):
 
 @router.post("/", response_model=schemas.Cliente)
 def create_cliente(cliente: schemas.ClienteBase):
+    from datetime import date
     db = database.SessionLocal()
     db_cliente = models.Cliente(
         nombre=cliente.nombre,
         cedula=cliente.cedula,
         direccion=cliente.direccion,
         negocio=cliente.negocio,
-        telefono=cliente.telefono
+        telefono=cliente.telefono,
+        fecha=date.today()
     )
     db.add(db_cliente)
     db.commit()
