@@ -10,6 +10,7 @@ class ClienteConSaldo(BaseModel):
     telefono: str
     saldo: float
     ultimo_pago: str | None = None
+    fecha: date
 
     class Config:
         from_attributes = True
@@ -30,6 +31,7 @@ class ClienteCreate(ClienteBase):
 
 class Cliente(ClienteBase):
     id: int
+    fecha: date
     class Config:
         from_attributes = True
 
