@@ -32,7 +32,7 @@ class ClienteCreate(ClienteBase):
 
 class Cliente(ClienteBase):
     id: int
-    fecha: date
+        creado_en: date
     class Config:
         from_attributes = True
 

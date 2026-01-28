@@ -73,10 +73,10 @@ def get_clientes_nuevos_hoy():
     try:
         hoy = date.today()
         clientes = db.query(models.Cliente).filter(models.Cliente.id != None).all()
-        # Filtrar por fecha de creación igual a hoy (si existe el campo 'fecha' en Cliente)
+        # Filtrar por fecha de creación igual a hoy (si existe el campo 'creado_en' en Cliente)
         # Si no existe, devolver vacío o todos
-        if hasattr(models.Cliente, 'fecha'):
-            clientes_hoy = [c for c in clientes if getattr(c, 'fecha', None) == hoy]
+        if hasattr(models.Cliente, 'creado_en'):
+            clientes_hoy = [c for c in clientes if getattr(c, 'creado_en', None) == hoy]
         else:
             clientes_hoy = []
         return clientes_hoy
@@ -91,7 +91,7 @@ def get_cliente_saldo(cliente_id: int):
     try:
         prestamo = db.query(models.Prestamo).filter(models.Prestamo.cliente_id == cliente_id, models.Prestamo.estado == 'activo').order_by(models.Prestamo.id.desc()).first()
         if not prestamo:
-            return {"saldo": 0.0, "prestamo": 0.0, "cuotasTotal": 0, "cuotasPagadas": 0, "atraso": 0, "fecha": None}
+            return {"saldo": 0.0, "prestamo": 0.0, "cuotasTotal": 0, "cuotasPagadas": 0, "atraso": 0, "creado_en": None}
 
         monto = prestamo.monto
         # Interés: 20% fijo (puedes cambiar esto si lo guardas en la BD)
@@ -186,7 +186,7 @@ def create_cliente(cliente: schemas.ClienteBase):
         direccion=cliente.direccion,
         negocio=cliente.negocio,
         telefono=cliente.telefono,
-        fecha=date.today()
+        creado_en=date.today()
     )
     db.add(db_cliente)
     db.commit()
