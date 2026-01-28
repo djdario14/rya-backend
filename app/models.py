@@ -10,7 +10,7 @@ class Cliente(Base):
     direccion = Column(String, nullable=False)
     negocio = Column(String, nullable=False)
     telefono = Column(String, nullable=False)
-    fecha = Column(Date, nullable=False)
+    creado_en = Column(Date, nullable=False)
     prestamos = relationship('Prestamo', back_populates='cliente')
 
 class Prestamo(Base):
