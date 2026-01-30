@@ -96,3 +96,18 @@ class Usuario(UsuarioBase):
     id: int
     class Config:
         from_attributes = True
+
+
+# Nuevo schema para el orden de clientes por usuario
+from typing import List
+class OrdenClientesUsuarioBase(BaseModel):
+    orden: List[int]
+
+class OrdenClientesUsuarioCreate(OrdenClientesUsuarioBase):
+    usuario_id: int
+
+class OrdenClientesUsuario(OrdenClientesUsuarioBase):
+    id: int
+    usuario_id: int
+    class Config:
+        from_attributes = True

@@ -5,6 +5,8 @@ from .. import models, schemas, database
 from sqlalchemy import func
 from typing import List
 
+from fastapi import Body
+
 router = APIRouter(prefix="/clientes", tags=["clientes"])
 
 # Endpoint para obtener los pagos registrados de un cliente (préstamo activo)
@@ -176,6 +178,20 @@ def get_cliente(cliente_id: int):
         "atraso": atraso
     }
 
+from typing import List
+
+from fastapi import Response
+# Endpoint para listar todos los clientes (acepta /clientes y /clientes/)
+@router.get("", response_model=List[schemas.Cliente])
+@router.get("/", response_model=List[schemas.Cliente])
+def list_clientes():
+    db = database.SessionLocal()
+    try:
+        clientes = db.query(models.Cliente).all()
+        return clientes
+    finally:
+        db.close()
+
 @router.post("/", response_model=schemas.Cliente)
 def create_cliente(cliente: schemas.ClienteBase):
     from datetime import date
@@ -192,3 +208,33 @@ def create_cliente(cliente: schemas.ClienteBase):
     db.commit()
     db.refresh(db_cliente)
     return db_cliente
+
+
+# --- ENDPOINTS PARA ORDEN DE CLIENTES POR USUARIO ---
+@router.post("/orden-usuario", response_model=schemas.OrdenClientesUsuario)
+def guardar_orden_clientes_usuario(data: schemas.OrdenClientesUsuarioCreate):
+    db = database.SessionLocal()
+    try:
+        # Buscar si ya existe un registro para este usuario
+        orden_existente = db.query(models.OrdenClientesUsuario).filter(models.OrdenClientesUsuario.usuario_id == data.usuario_id).first()
+        if orden_existente:
+            orden_existente.orden = data.orden
+        else:
+            orden_existente = models.OrdenClientesUsuario(usuario_id=data.usuario_id, orden=data.orden)
+            db.add(orden_existente)
+        db.commit()
+        db.refresh(orden_existente)
+        return orden_existente
+    finally:
+        db.close()
+
+@router.get("/orden-usuario/{usuario_id}", response_model=schemas.OrdenClientesUsuario)
+def obtener_orden_clientes_usuario(usuario_id: int):
+    db = database.SessionLocal()
+    try:
+        orden = db.query(models.OrdenClientesUsuario).filter(models.OrdenClientesUsuario.usuario_id == usuario_id).first()
+        if not orden:
+            raise HTTPException(status_code=404, detail="No hay orden guardada para este usuario")
+        return orden
+    finally:
+        db.close()

@@ -50,3 +50,13 @@ class Usuario(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+
+
+# Nuevo modelo para guardar el orden de clientes por usuario
+from sqlalchemy import JSON
+class OrdenClientesUsuario(Base):
+    __tablename__ = 'orden_clientes_usuario'
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_id = Column(Integer, ForeignKey('usuarios.id'), nullable=False)
+    orden = Column(JSON, nullable=False)  # Lista de IDs de clientes
+    usuario = relationship('Usuario')
