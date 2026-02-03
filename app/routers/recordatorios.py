@@ -47,19 +47,27 @@ def get_all_recordatorios(db: Session = Depends(get_db)):
 
 @router.post("/", response_model=schemas.Recordatorio)
 def create_recordatorio(recordatorio: schemas.RecordatorioCreate, db: Session = Depends(get_db)):
-    # Convertir fecha local (sin zona horaria) a UTC
     from datetime import datetime
     import pytz
-    # Asumimos que la fecha recibida es local (America/Guayaquil)
-    local_tz = pytz.timezone("America/Guayaquil")
-    # Si la fecha ya tiene zona horaria, no hace nada; si no, la agrega como local
-    if recordatorio.fecha.tzinfo is None:
-        dt_local = local_tz.localize(recordatorio.fecha)
-    else:
-        dt_local = recordatorio.fecha.astimezone(local_tz)
-    dt_utc = dt_local.astimezone(pytz.utc)
+    from dateutil import parser
+
+    # Robustly parse fecha as ISO 8601 string or datetime
+    fecha = recordatorio.fecha
+    if isinstance(fecha, str):
+        try:
+            fecha = parser.isoparse(fecha)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Fecha inválida. Debe ser ISO 8601.")
+
+    # If fecha is naive, assume America/Guayaquil local time
+    if fecha.tzinfo is None:
+        local_tz = pytz.timezone("America/Guayaquil")
+        fecha = local_tz.localize(fecha)
+    # Convert to UTC
+    fecha_utc = fecha.astimezone(pytz.utc)
+
     data = recordatorio.dict()
-    data['fecha'] = dt_utc
+    data['fecha'] = fecha_utc
     db_recordatorio = models.Recordatorio(**data)
     db.add(db_recordatorio)
     db.commit()
