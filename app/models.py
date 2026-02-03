@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -60,3 +60,13 @@ class OrdenClientesUsuario(Base):
     usuario_id = Column(Integer, ForeignKey('usuarios.id'), nullable=False)
     orden = Column(JSON, nullable=False)  # Lista de IDs de clientes
     usuario = relationship('Usuario')
+
+class Recordatorio(Base):
+    __tablename__ = 'recordatorios'
+    id = Column(Integer, primary_key=True, index=True)
+    cliente_id = Column(Integer, ForeignKey('clientes.id'), nullable=False)
+    fecha = Column(DateTime, nullable=False)
+    nota = Column(String, nullable=True)
+    creado_en = Column(DateTime, nullable=False)
+    leido = Column(Integer, default=0)  # 0 = no leído, 1 = leído
+    cliente = relationship('Cliente')

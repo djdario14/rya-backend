@@ -1,5 +1,6 @@
 from datetime import date
 from pydantic import BaseModel
+from datetime import datetime
 
 # --- Cliente con saldo para endpoint especial ---
 class ClienteConSaldo(BaseModel):
@@ -109,5 +110,20 @@ class OrdenClientesUsuarioCreate(OrdenClientesUsuarioBase):
 class OrdenClientesUsuario(OrdenClientesUsuarioBase):
     id: int
     usuario_id: int
+    class Config:
+        from_attributes = True
+
+class RecordatorioBase(BaseModel):
+    cliente_id: int
+    fecha: datetime
+    nota: str | None = None
+    creado_en: datetime
+    leido: int = 0
+
+class RecordatorioCreate(RecordatorioBase):
+    pass
+
+class Recordatorio(RecordatorioBase):
+    id: int
     class Config:
         from_attributes = True

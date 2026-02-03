@@ -1,10 +1,9 @@
-
 # Redeploy trigger
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import clientes, prestamos, pagos, usuarios, gastos
+from .routers import clientes, prestamos, pagos, usuarios, gastos, recordatorios
 
 app = FastAPI()
 
@@ -36,3 +35,4 @@ app.include_router(prestamos.router)
 app.include_router(pagos.router)
 app.include_router(usuarios.router)
 app.include_router(gastos.router)
+app.include_router(recordatorios.router)
